@@ -1,1 +1,2 @@
 output_k8s_manifests
+.env
