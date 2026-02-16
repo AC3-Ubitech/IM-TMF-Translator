@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uc3-frontend
+  namespace: ${ApplicationName}
+  labels:
+    app: uc3-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uc3-frontend
+  template:
+    metadata:
+      labels:
+        app: uc3-frontend
+    spec:
+      containers:
+      - image: ${Image}
+        name: frontend
+        ports:
+        - containerPort: ${ApiPort1}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: uc3-frontend-service
+  namespace: ${ApplicationName}
+  labels:
+    app: uc3-frontend
+spec:
+  selector:
+    app: uc3-frontend
+  ports:
+  - port: ${ApiPort1}
+    targetPort: ${ApiPort1}
+  type: ClusterIP
+
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: uc3-frontend-route
+  namespace: ${ApplicationName}
+  labels:
+    app: uc3-frontend
+spec:
+  to:
+    kind: Service
+    name: uc3-frontend-service
+  port:
+    targetPort: ${ApiPort1}
+  tls:
+    termination: edge 

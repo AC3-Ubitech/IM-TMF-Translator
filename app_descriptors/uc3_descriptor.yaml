@@ -1,0 +1,370 @@
+ApplicationName: uc3-applications
+Version: 1.0.0
+Microservices:
+- MicroserviceName: producer
+  Image: quay.io/rh_et_wd/ac3/astroapp-backend:voronoi
+  ID: producer
+  ServiceAccountName: starlight-sa
+  SecurityContext:
+    privileged: true
+  Dependencies:
+    - rabbitmq
+    - redis
+  EnvironmentVariables:
+    RABBITMQ_USER: RABBITMQ_USER
+    RABBITMQ_PASSWORD: guest
+    RABBITMQ_HOST: rabbitmq
+    RABBITMQ_PORT: '5672'
+    JOB_SIZE: '5'
+    AWS_ACCESS_KEY_ID: EEAAAAHuEn6LkwZJGpUAikGoJHyOrAra4yXAV1WVXpvA8XU0HAAAAAEB7vvNAAAAAAHu
+    AWS_SECRET_ACCESS_KEY: D3c2ApVsGGa7Wm1+pmfDwJddoPxhY3qSwU1U2EUUyKJRE07H3MjR3nwwaxim7mhY
+    S3_ENDPOINT: https://s3.eu-central-1.ionoscloud.com
+    S3_REGION: de
+    S3_BUCKET_NAME: test-consumer
+    EXPLORED_STARLIGHT: starlight/input
+    EXPLORED_PPXF: ppxf/input
+    EXPLORED_VORONOI: voronoi/input
+    EXPLORED_STECKMAP: steckmap/input
+    PROCESSED_STARLIGHT: starlight/processed
+    PROCESSED_PPXF: ppxf/processed
+    PROCESSED_VORONOI: voronoi/processed
+    PROCESSED_STECKMAP: steckmap/processed
+    OUTPUT_STARLIGHT: starlight/output
+    OUTPUT_PPXF: ppxf/output
+    OUTPUT_VORONOI: voronoi/output
+    OUTPUT_STECKMAP: steckmap/output
+    TEMPLATE_IN_FILE_PATH: /docker/starlight/config_files_starlight/grid_example.in
+    IN_FILE_OUTPUT_PATH: /processing_data/starlight/runtime/infiles/
+    IN_FILE_PATH: /processing_data/starlight/runtime/infiles
+    PROCESS_LIST_STARLIGHT: /processing_data/starlight/runtime/processlist.txt
+    PROCESS_LIST_PPXF: /processing_data/ppxf/runtime/processlist.txt
+    OUTPUT_BUCKET_STARLIGHT: starlight/output
+    OUTPUT_BUCKET_PPXF: ppxf/output
+    OUTPUT_BUCKET_VORONOI: voronoi/output
+    OUTPUT_BUCKET_STECKMAP: steckmap/output
+    REDIS_HOST: redis
+    REDIS_PORT: '6379'
+    REDIS_PASSWORD: ''
+    METRICS: metrics/
+    SERVER_PORT: '8080'
+    CORS_ALLOWED_ORIGINS: '*'
+  apiEndpoint: http://uc3-backend-service.ac3-cluster-4.rh-horizon.eu
+  apiPort:
+    - '8080:8080'
+    - '9090:9090'
+  InternetAccess: 'false'
+  GeographicalAffinity: Cloud
+  Region: Central Cloud
+  Volumes:
+    - Name: ucm-pv-volume-producer
+      Volume Source:
+        Persistent Volume Claim:
+          Claim Name: ucm-pv-claim-producer
+  VolumeMounts:
+    - Name: ucm-pv-volume-producer
+      MountPath: /processing_data/
+- MicroserviceName: processor
+  Image: quay.io/rh_et_wd/ac3/astroapp-backend:voronoi
+  ID: processor
+  SecurityContext:
+    privileged: true
+  ServiceAccountName: starlight-sa
+  Dependencies:
+    - rabbitmq
+  EnvironmentVariables:
+    POD_NAME: 'valueFrom:             fieldRef:               fieldPath: metadata.name'
+    RABBITMQ_USER: guest
+    RABBITMQ_PASSWORD: guest
+    RABBITMQ_HOST: rabbitmq
+    RABBITMQ_PORT: '5672'
+    JOB_SIZE: '5'
+    AWS_ACCESS_KEY_ID: EEAAAAHuEn6LkwZJGpUAikGoJHyOrAra4yXAV1WVXpvA8XU0HAAAAAEB7vvNAAAAAAHu
+    AWS_SECRET_ACCESS_KEY: D3c2ApVsGGa7Wm1+pmfDwJddoPxhY3qSwU1U2EUUyKJRE07H3MjR3nwwaxim7mhY
+    S3_ENDPOINT: https://s3.eu-central-1.ionoscloud.com
+    S3_REGION: de
+    S3_BUCKET_NAME: test-consumer
+    IN_FILE_OUTPUT_PATH: /processing_data/starlight/runtime/infiles/
+    PROCESS_LIST_STARLIGHT: /processing_data/starlight/runtime/processlist-$(POD_NAME).txt
+    PROCESS_LIST_STARLIGHT_PATH: /processing_data/starlight/runtime
+    PROCESS_LIST_PPXF: /processing_data/ppxf/runtime/processlist-$(POD_NAME).txt
+    PROCESS_LIST_PPXF_PATH: /processing_data/ppxf/runtime
+    PROCESS_LIST_VORONOI: /processing_data/voronoi/runtime/processlist-$(POD_NAME).txt
+    PROCESS_LIST_VORONOI_PATH: /processing_data/voronoi/runtime
+    INPUT_DIR_STARLIGHT: /processing_data/starlight/data/input
+    EXPLORED_DIR_STARLIGHT: /processing_data/starlight/data/output
+    PROCESSED_STARLIGHT: /processing_data/starlight/data/processed
+    INPUT_DIR_PPXF: /processing_data/ppxf/data/input
+    EXPLORED_DIR_PPXF: /processing_data/ppxf/data/output
+    PROCESSED_PPXF: /processing_data/ppxf/data/processed
+    INPUT_DIR_VORONOI: /processing_data/voronoi/data/input
+    OUTPUT_DIR_VORONOI: /processing_data/voronoi/data/output
+    PROCESSED_VORONOI: /processing_data/voronoi/data/processed
+    EXPLORED_DIR_STECKMAP: /processing_data/steckmap/data/input
+    OUTPUT_DIR_STECKMAP: /processing_data/steckmap/data/output
+    PROCESSED_STECKMAP: /processing_data/steckmap/data/processed
+    TEMPLATE_IN_FILE_PATH: /docker/starlight/config_files_starlight/grid_example.in
+    EXPLORED_STARLIGHT: /processing_data/starlight/data/output
+    OUTPUT_STARLIGHT: /processing_data/starlight/data/output
+    EXPLORED_PPXF: /processing_data/ppxf/data/output
+    OUTPUT_PPXF: /processing_data/ppxf/data/output
+    EXPLORED_VORONOI: /processing_data/voronoi/data/output
+    EXPLORED_STECKMAP: /processing_data/steckmap/data/input
+    OUTPUT_STECKMAP: /processing_data/steckmap/data/output
+    OUTPUT_BUCKET_STARLIGHT: starlight/output
+    OUTPUT_BUCKET_PPXF: ppxf/output
+    OUTPUT_BUCKET_VORONOI: voronoi/output
+    OUTPUT_BUCKET_STECKMAP: steckmap/output
+    BATCH_INFO_DIR: /processing_data/batch_info
+    REDIS_HOST: redis
+    REDIS_PORT: '6379'
+    REDIS_PASSWORD: ''
+    PPXF_INPUT_DIR: /processing_data/ppxf/data/input
+    PPXF_OUTPUT_DIR: /processing_data/ppxf/data/output
+    API_URL: http://uc3-backend-service:8080/api/progress/update
+    INPUT_DIR: /processing_data/voronoi/data/input
+    OUTPUT_DIR: /processing_data/voronoi/data/output
+    PROCESS_FILE: /processing_data/voronoi/runtime/processlist-$(POD_NAME).txt
+    SCALING_VAR: predicted_job_time
+    SCALING_THRESHOLD: '30'
+  apiPort:
+    - '5672:5672'
+  InternetAccess: 'false'
+  GeographicalAffinity: Edge
+  Region: Edge
+  Volumes:
+    - Name: ucm-pv-volume
+      Volume Source:
+        Persistent Volume Claim:
+          Claim Name: ucm-pv-claim
+  VolumeMounts:
+    - Name: ucm-pv-volume
+      MountPath: /processing_data/
+- MicroserviceName: rabbitmq
+  Image: rabbitmq:3-management
+  ID: rabbitmq
+  SecurityContext:
+    privileged: true
+  ServiceAccountName: starlight-sa
+  EnvironmentVariables:
+    RABBITMQ_DEFAULT_USER: guest
+    RABBITMQ_DEFAULT_PASS: guest
+  apiPort:
+    - '5672:5672'
+    - '15672:15672'
+  InternetAccess: 'false'
+  GeographicalAffinity: Cloud
+  Region: Central Cloud
+- MicroserviceName: frontend
+  Image: quay.io/rh_et_wd/ac3/astroapp-gui:voronoi
+  ID: frontend
+  SecurityContext:
+    privileged: true
+  ServiceAccountName: starlight-sa
+  Dependencies:
+    - processor
+    - producer
+  apiEndpoint: http://uc3-frontend-service.ac3-cluster-4.rh-horizon.eu
+  apiPort:
+    - '8080:8080'
+  InternetAccess: 'true'
+  GeographicalAffinity: Cloud
+  Region: Central Cloud
+- MicroserviceName: redis
+  Image: registry.redhat.io/rhel8/redis-6:latest
+  ID: redis
+  SecurityContext:
+    privileged: true
+  ServiceAccountName: starlight-sa
+  apiPort:
+    - '6379:6379'
+  InternetAccess: 'true'
+  GeographicalAffinity: Cloud
+  Region: Central Cloud
+  Volumes:
+    - Name: redis-data
+  VolumeMounts:
+    - Name: redis-data
+      MountPath: /data
+- MicroserviceName: transfer
+  Image: quay.io/ryjenkin/trigger-transfer:asset-id-fix
+  ID: transfer
+  SecurityContext:
+    privileged: true
+  ServiceAccountName: starlight-sa
+  Dependencies:
+    - producer
+  InternetAccess: 'false'
+  GeographicalAffinity: Cloud
+  Region: Central Cloud
+- MicroserviceName: vault
+  Image: hashicorp/vault:1.17.2
+  ID: vault
+  SecurityContext:
+    privileged: true
+  ServiceAccountName: starlight-sa
+  EnvironmentVariables:
+    VAULT_DEV_ROOT_TOKEN_ID: test-token
+    VAULT_ADDR: http://0.0.0.0:8200
+    VAULT_DISABLE_MLOCK: 'true'
+    SKIP_SETCAP: 'true'
+    HOME: /vault/data
+  apiPort:
+    - '8200:8200'
+  InternetAccess: 'true'
+  GeographicalAffinity: Cloud
+  Region: Central Cloud
+- MicroserviceName: data-connector
+  Image: quay.io/bcapper30/s3-conn-env
+  ID: data-connector
+  SecurityContext:
+    privileged: true
+  ServiceAccountName: starlight-sa
+  Dependencies:
+    - vault
+    - producer
+  EnvironmentVariables:
+    JAVA_TOOL_OPTIONS: '-Dedc.fs.config=/app/resources/config.properties'
+    EDC_PARTICIPANT_ID: consumer
+    WEB_HTTP_PORT: '9191'
+    WEB_HTTP_PATH: /api
+    WEB_HTTP_MANAGEMENT_PORT: '9192'
+    WEB_HTTP_MANAGEMENT_PATH: /management
+    WEB_HTTP_PROTOCOL_PORT: '9292'
+    WEB_HTTP_PROTOCOL_PATH: /protocol
+    WEB_HTTP_CONTROL_PORT: '9293'
+    WEB_HTTP_CONTROL_PATH: /control
+    WEB_HTTP_PUBLIC_PORT: '9393'
+    WEB_HTTP_PUBLIC_PATH: /public
+    EDC_DSP_CALLBACK_ADDRESS: >-
+      http://consumer-protocol-uc3-applications.apps.ac3-cluster-4.rh-horizon.eu/protocol
+    EDC_DATAPLANE_TOKEN_VALIDATION_ENDPOINT: http://localhost:9293/control/token
+    EDC_DATAPLANE_API_PUBLIC_BASEURL: http://localhost:9393/public
+    EDC_DSP_HTTP_ENABLED: 'true'
+    EDC_API_AUTH_KEY: password
+    EDC_TRANSFER_PROXY_TOKEN_SIGNER_PRIVATEKEY_ALIAS: edc.connector.private.key
+    EDC_TRANSFER_PROXY_TOKEN_VERIFIER_PUBLICKEY_ALIAS: edc.connector.public.key
+    EDC_VAULT_HASHICORP_URL: http://hashicorp-vault-uc3-applications.apps.ac3-cluster-4.rh-horizon.eu
+    EDC_VAULT_HASHICORP_TOKEN: test-token
+    EDC_VAULT_HASHICORP_TIMEOUT_SECONDS: '30'
+    EDC_IONOS_ACCESS_KEY: >-
+      EEAAAAHuEn6LkwZJGpUAikGoJHyOrAra4yXAV1WVXpvA8XU0HAAAAAEB7vvNAAAAAAHu-80YrfBIAbZ4Ef4idjOF9BTQ
+    EDC_IONOS_SECRET_KEY: D3c2ApVsGGa7Wm1+pmfDwJddoPxhY3qSwU1U2EUUyKJRE07H3MjR3nwwaxim7mhY
+    EDC_IONOS_ENDPOINT_REGION: de
+    EDC_IONOS_TOKEN: >-
+      eyJ0eXAiOiJKV1QiLCJraWQiOiJiNzlkODE3OS02MmFhLTRkMGYtODU0Zi1lMzQyMmNmYzE1MTciLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJpb25vc2Nsb3VkIiwiaWF0IjoxNzQ0ODE0NzE0LCJjbGllbnQiOiJVU0VSIiwiaWRlbnRpdHkiOnsicm9sZSI6ImFkbWluIiwiY29udHJhY3ROdW1iZXIiOjMyNDM5MjQ1LCJpc1BhcmVudCI6ZmFsc2UsInByaXZpbGVnZXMiOlsiREFUQV9DRU5URVJfQ1JFQVRFIiwiU05BUFNIT1RfQ1JFQVRFIiwiSVBfQkxPQ0tfUkVTRVJWRSIsIk1BTkFHRV9EQVRBUExBVEZPUk0iLCJBQ0NFU1NfQUNUSVZJVFlfTE9HIiwiUENDX0NSRUFURSIsIkFDQ0VTU19TM19PQkpFQ1RfU1RPUkFHRSIsIkJBQ0tVUF9VTklUX0NSRUFURSIsIkNSRUFURV9JTlRFUk5FVF9BQ0NFU1MiLCJLOFNfQ0xVU1RFUl9DUkVBVEUiLCJGTE9XX0xPR19DUkVBVEUiLCJBQ0NFU1NfQU5EX01BTkFHRV9NT05JVE9SSU5HIiwiQUNDRVNTX0FORF9NQU5BR0VfQ0VSVElGSUNBVEVTIiwiQUNDRVNTX0FORF9NQU5BR0VfTE9HR0lORyIsIk1BTkFHRV9EQkFBUyIsIkFDQ0VTU19BTkRfTUFOQUdFX0ROUyIsIk1BTkFHRV9SRUdJU1RSWSIsIkFDQ0VTU19BTkRfTUFOQUdFX0NETiIsIkFDQ0VTU19BTkRfTUFOQUdFX1ZQTiIsIkFDQ0VTU19BTkRfTUFOQUdFX0FQSV9HQVRFV0FZIiwiQUNDRVNTX0FORF9NQU5BR0VfTkdTIiwiQUNDRVNTX0FORF9NQU5BR0VfS0FBUyIsIkFDQ0VTU19BTkRfTUFOQUdFX05FVFdPUktfRklMRV9TVE9SQUdFIiwiQUNDRVNTX0FORF9NQU5BR0VfQUlfTU9ERUxfSFVCIiwiQ1JFQVRFX05FVFdPUktfU0VDVVJJVFlfR1JPVVBTIiwiQUNDRVNTX0FORF9NQU5BR0VfSUFNX1JFU09VUkNFUyJdLCJ1dWlkIjoiZWUxMjdlOGItOTMwNi00OTFhLTk1MDAtOGE0MWE4MjQ3YzhlIiwicmVzZWxsZXJJZCI6MSwicmVnRG9tYWluIjoiaW9ub3MuZGUifSwiZXhwIjoxNzc2MzUwNzE0fQ.K8axaTD53Mr1ymn5X9dJhI8DlAu2cO_IgknpBtFjs9tOPkSGPwKc8ImTfyiJbiA3UemXAoLQ4W67KUf7SR7E8dOJWRbnCdv4OAMk1MGDcQ58gRPlwQ-ztS6sHN0PWQsB7Os4IILkgDsUKMvDNj_FWWBFy3910ztnkqvrgmexQJcgOsm0VumxmBWntRnNPpaudl8GK2wJip-fn8iNOwss9qz_IqlN7PilmdYLzVMIk9KNIRUWnjLj2wdbYmJaS4tDkUFcm5y17pICx4hyaBNo19pN2B7FWEvDsWGK_avCsxkUiI5mpiYnEW5dIwPRMr_LsiQleFxUZnY46xa5ekttbA
+  apiEndpoint: api
+  apiPort:
+    - '9191:9191'
+    - '9192:9192'
+    - '9292:9292'
+    - '9293:9293'
+    - '9393:9393'
+  InternetAccess: 'true'
+  GeographicalAffinity: Cloud
+  Region: Central Cloud
+- MicroserviceName: model-api
+  Image: quay.io/rh_et_wd/ac3/predicter_mock_api:latest
+  ID: model-api
+  SecurityContext:
+    privileged: true
+  ServiceAccountName: starlight-sa
+  apiPort:
+    - '5000:5000'
+  InternetAccess: 'false'
+  GeographicalAffinity: Cloud
+  Region: Central Cloud
+- MicroserviceName: predictor-client
+  Image: quay.io/rh_et_wd/ac3/hautoscaler:latest
+  ID: predictor-client
+  SecurityContext:
+    privileged: true
+  ServiceAccountName: starlight-sa
+  EnvironmentVariables:
+    PREDICTOR_API_URL: http://model-api:5000/predict
+    PROMETHEUS_URL: https://thanos-querier.openshift-monitoring.svc.cluster.local:9091
+    NUMPROCESSORS_QUERY: num_processors
+    JOBSIZE_QUERY: astroapp_job_size_mb
+    QUEUELEN_QUERY: astroapp_job_queue_ahead_length
+    QUERY_INTERVAL_SECONDS: '10'
+    AVERAGING_WINDOW_SIZE: '5'
+    EXPORTER_PORT: '9090'
+  apiPort:
+    - '9090:9090'
+  InternetAccess: 'false'
+  GeographicalAffinity: Cloud
+  Region: Central Cloud
+NetworkingGraph:
+  - Source: producer
+    Destination: rabbitmq
+    Protocol: TCP
+    Port: 5672
+  - Source: producer
+    Destination: redis
+    Protocol: TCP
+    Port: 6379
+  - Source: processor
+    Destination: rabbitmq
+    Protocol: TCP
+    Port: 5672
+  - Source: frontend
+    Destination: producer
+    Protocol: HTTP
+    Port: 8080
+  - Source: data-connector
+    Destination: vault
+    Protocol: HTTP
+    Port: 8200
+VolumesConfiguration:
+  - VolumeName: ''
+    VolumeType: ''
+    StorageClass: ''
+    Capacity: ''
+    ClaimName: ucm-pv-claim
+    HostPath: /mnt/ucmdata
+    ClaimSpec:
+      Resources:
+        Requests:
+          Storage: 3Gi
+      Storage Class Name: standard
+      Access Modes:
+        - ReadWriteOnce
+  - VolumeName: ''
+    VolumeType: ''
+    StorageClass: ''
+    Capacity: ''
+    ClaimName: ucm-pv-claim-producer
+    HostPath: /mnt/ucmdemo
+    ClaimSpec:
+      Resources:
+        Requests:
+          Storage: 3Gi
+      Storage Class Name: standard
+      Access Modes:
+        - ReadWriteOnce
+SecurityConfiguration:
+- ServiceAccountName: starlight-sa
+  ApiVersion: v1
+  Kind: ServiceAccount
+  Metadata:
+    Name: starlight-sa
+  RoleBindingName: privileged-role
+  RoleRef:
+    ApiGroup: rbac.authorization.k8s.io
+    Kind: ClusterRole
+    Name: system:openshift:scc:privileged
+  Subjects:
+    - Kind: ServiceAccount
+      Name: starlight-sa
+- ServiceAccountName: uc3-monitoring
+  ApiVersion: v1
+  Kind: ServiceAccount
+  Metadata:
+    Name: uc3-monitoring
+  RoleBindingName: uc3-monitoring-cluster-monitoring-view
+  RoleRef:
+    Kind: ClusterRole
+    Name: cluster-monitoring-view
+    ApiGroup: rbac.authorization.k8s.io
+  Subjects:
+    - Kind: ServiceAccount
+      Name: uc3-monitoring

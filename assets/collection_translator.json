@@ -1,0 +1,414 @@
+{
+	"info": {
+		"_postman_id": "06e1fb3d-fb8b-4138-a4dd-1cca96384c13",
+		"name": "Maestro Workflows Translator",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "24507421",
+		"_collection_link": "https://ubi-nsit.postman.co/workspace/Team-Workspace~4f9af22b-0691-423c-84f9-991da3062402/collection/24507421-06e1fb3d-fb8b-4138-a4dd-1cca96384c13?action=share&source=collection_link&creator=24507421"
+	},
+	"item": [
+		{
+			"name": "GetAccesTokenKeycloak",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const response = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"if (response.access_token.length == 0){",
+							"    postman.setNextRequest(null);",
+							"    pm.expect.fail('Access token is zero length!');",
+							"}",
+							"",
+							"pm.environment.set(\"_KeycloakAccessToken\", response.access_token);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "client_secret",
+						"value": "RgxWzcE2a5PEk7s0xNnsB6sDPdjlwkux",
+						"equals": false,
+						"disabled": true
+					},
+					{
+						"key": "grant_type",
+						"value": "password",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "username",
+						"value": "admin",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "password",
+						"value": "password",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "client_id",
+						"value": "tmf-api",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "client_id",
+							"value": "tmf-api",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "A0cx2x4YT5vqYX3hpmA4kURyGncsl4Vd",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "password",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{host-keycloak}}/realms/tmf/protocol/openid-connect/token",
+					"host": [
+						"{{host-keycloak}}"
+					],
+					"path": [
+						"realms",
+						"tmf",
+						"protocol",
+						"openid-connect",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateServiceOrder",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var uuid = require('uuid'); ",
+							"",
+							"const currentDate = new Date();",
+							"//var futureDate = new Date();",
+							"//futureDate.setHours(currentDate.getHours() + 1) // after one hour",
+							"",
+							"pm.environment.set(\"_ServiceOrderRandomUUID\",  uuid.v4());",
+							"pm.environment.set(\"_ServiceCurrentIsoTime\", currentDate.toISOString());",
+							"//pm.environment.set(\"_ServiceFutureIsoTime\", futureDate.toISOString());",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{_KeycloakAccessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"id\": \"{{_ServiceOrderRandomUUID}}\",\r\n  \"orderDate\": \"{{_ServiceCurrentIsoTime}}\",\r\n  \"completionDate\": null,\r\n  \"expectedCompletionDate\": \"2025-11-15T16:30:53Z\",\r\n  \"requestedCompletionDate\": \"2025-11-15T16:30:53Z\",\r\n  \"requestedStartDate\":  \"{{_ServiceCurrentIsoTime}}\",\r\n  \"startDate\":  \"{{_ServiceCurrentIsoTime}}\",\r\n  \"@baseType\": \"BaseRootEntity\",\r\n  \"state\": \"INITIAL\",\r\n  \"@schemaLocation\": null,\r\n  \"@type\": \"ServiceOrder\",\r\n  \"href\": null,\r\n  \"category\": null,\r\n  \"description\": \"A service order for Starlight service\",\r\n  \"externalId\": null,\r\n  \"notificationContact\": null,\r\n  \"priority\": null,\r\n  \"note\": [],\r\n  \"serviceOrderItem\": [\r\n    {\r\n      \"@baseType\": \"BaseEntity\",\r\n      \"@schemaLocation\": null,\r\n      \"@type\": null,\r\n      \"href\": null,\r\n      \"action\": \"add\",\r\n      \"orderItemRelationship\": [],\r\n      \"state\": \"ACKNOWLEDGED\",\r\n      \"service\": {\r\n        \"serviceSpecification\": {\r\n          \"@baseType\": \"BaseEntity\",\r\n          \"@schemaLocation\": null,\r\n          \"@type\": null,\r\n          \"href\": null,\r\n          \"name\": \"service-spec-end-user-cfs-ocm\",\r\n          \"version\": \"1.2.0\",\r\n          \"targetServiceSchema\": null,\r\n          \"@referredType\": null,\r\n          \"id\": \"e76d354c-36c9-485f-b75a-c7b9be689e4c\"\r\n        },\r\n        \"@baseType\": \"BaseEntity\",\r\n        \"@schemaLocation\": null,\r\n        \"@type\": null,\r\n        \"href\": null,\r\n        \"name\": \"service-spec-end-user-cfs-ocm\",\r\n        \"category\": null,\r\n        \"serviceType\": null,\r\n        \"place\": [],\r\n        \"relatedParty\": [],\r\n        \"serviceCharacteristic\": [\r\n          {\r\n            \"@baseType\": \"BaseRootEntity\",\r\n            \"@schemaLocation\": null,\r\n            \"@type\": null,\r\n            \"href\": null,\r\n            \"name\": \"Service name\",\r\n            \"valueType\": \"TEXT\",\r\n            \"value\": {\r\n              \"value\": \"Starlight App\",\r\n              \"alias\": null\r\n            }\r\n          },\r\n          {\r\n            \"@baseType\": \"BaseRootEntity\",\r\n            \"@schemaLocation\": null,\r\n            \"@type\": null,\r\n            \"href\": null,\r\n            \"name\": \"Service package manager\",\r\n            \"valueType\": \"ENUM\",\r\n            \"value\": {\r\n              \"value\": \"helm\",\r\n              \"alias\": null\r\n            }\r\n          },\r\n          {\r\n            \"@baseType\": \"BaseRootEntity\",\r\n            \"@schemaLocation\": null,\r\n            \"@type\": null,\r\n            \"href\": null,\r\n            \"name\": \"Base service registry/repository URL\",\r\n            \"valueType\": \"TEXT\",\r\n            \"value\": {\r\n              \"value\": \"oci://registry.ubitech.eu/nsit/eu-projects/ac3/translated-descriptors/\",\r\n              \"alias\": null\r\n            }\r\n          },\r\n          {\r\n            \"@baseType\": \"BaseRootEntity\",\r\n            \"@schemaLocation\": null,\r\n            \"@type\": null,\r\n            \"href\": null,\r\n            \"name\": \"Service artifact identifier in service registry/repository\",\r\n            \"valueType\": \"TEXT\",\r\n            \"value\": {\r\n              \"value\": \"im-translator\",\r\n              \"alias\": null\r\n            }\r\n          },\r\n          {\r\n            \"@baseType\": \"BaseRootEntity\",\r\n            \"@schemaLocation\": null,\r\n            \"@type\": null,\r\n            \"href\": null,\r\n            \"name\": \"Service artifact version\",\r\n            \"valueType\": \"TEXT\",\r\n            \"value\": {\r\n              \"value\": \"1.0.0\",\r\n              \"alias\": null\r\n            }\r\n          },\r\n          {\r\n            \"@baseType\": \"BaseRootEntity\",\r\n            \"@schemaLocation\": null,\r\n            \"@type\": null,\r\n            \"href\": null,\r\n            \"name\": \"Cluster Manager\",\r\n            \"valueType\": \"ENUM\",\r\n            \"value\": {\r\n              \"value\": \"ocm\",\r\n              \"alias\": null\r\n            }\r\n          },\r\n          {\r\n            \"@baseType\": \"BaseRootEntity\",\r\n            \"@schemaLocation\": null,\r\n            \"@type\": null,\r\n            \"href\": null,\r\n            \"name\": \"Cluster Metadata\",\r\n            \"valueType\": \"TEXT\",\r\n            \"value\": {\r\n              \"value\": \"YXBpVmVyc2lvbjogc2NoZWR1bGluZy5wMmNvZGUuZXUvdjFhbHBoYTEKa2luZDogUDJDb2RlU2NoZWR1bGluZ01hbmlmZXN0Cm1ldGFkYXRhOgogIGxhYmVsczoKICAgIGFwcC5rdWJlcm5ldGVzLmlvL25hbWU6IHAyY29kZS1zY2hlZHVsZXIKICAgIGFwcC5rdWJlcm5ldGVzLmlvL21hbmFnZWQtYnk6IGt1c3RvbWl6ZQogIG5hbWU6IHRyYW5zbGF0ZWQtYXBwCiAgbmFtZXNwYWNlOiBwMmNvZGUtc2NoZWR1bGVyLXN5c3RlbQpzcGVjOgogIGdsb2JhbEFubm90YXRpb25zOgogICAgLSAicDJjb2RlLnRhcmdldC5tYW5hZ2VkQ2x1c3RlclNldD1hYzMiCiAgICAtICJwMmNvZGUudGFyZ2V0LmNsdXN0ZXI9Y2x1c3Rlci00Igo=\",\r\n              \"alias\": null\r\n            }\r\n          }\r\n        ],\r\n        \"state\": \"feasibilityChecked\",\r\n        \"supportingResource\": [],\r\n        \"serviceRelationship\": [],\r\n        \"supportingService\": []\r\n      },\r\n      \"appointment\": null\r\n    },\r\n    {\r\n      \"@baseType\": \"BaseEntity\",\r\n      \"@schemaLocation\": null,\r\n      \"@type\": null,\r\n      \"href\": null,\r\n      \"action\": \"add\",\r\n      \"orderItemRelationship\": [],\r\n      \"state\": \"ACKNOWLEDGED\",\r\n      \"service\": {\r\n        \"serviceSpecification\": {\r\n          \"@baseType\": \"BaseEntity\",\r\n          \"@schemaLocation\": null,\r\n          \"@type\": null,\r\n          \"href\": null,\r\n          \"name\": \"AC3-K8aaS-OCM:Openslice-athens\",\r\n          \"version\": \"1.2.0\",\r\n          \"targetServiceSchema\": null,\r\n          \"@referredType\": null,\r\n          \"id\": \"91559075-eacb-40e5-bdca-adf4c6174288\"\r\n        },\r\n        \"@baseType\": \"BaseEntity\",\r\n        \"@schemaLocation\": null,\r\n        \"@type\": null,\r\n        \"href\": null,\r\n        \"name\": \"AC3-K8aaS-OCM:Openslice-athens\",\r\n        \"category\": null,\r\n        \"serviceType\": null,\r\n        \"place\": [],\r\n        \"relatedParty\": [],\r\n        \"serviceCharacteristic\": [\r\n          {\r\n            \"@baseType\": \"BaseRootEntity\",\r\n            \"@schemaLocation\": null,\r\n            \"@type\": null,\r\n            \"href\": null,\r\n            \"name\": \"Number of worker nodes\",\r\n            \"valueType\": \"TEXT\",\r\n            \"value\": {\r\n              \"value\": \"1\",\r\n              \"alias\": null\r\n            }\r\n          }\r\n        ],\r\n        \"state\": \"feasibilityChecked\",\r\n        \"supportingResource\": [],\r\n        \"serviceRelationship\": [],\r\n        \"supportingService\": []\r\n      },\r\n      \"appointment\": null\r\n    }\r\n  ],\r\n  \"orderRelationship\": [],\r\n  \"relatedParty\": [\r\n    {\r\n      \"@baseType\": \"BaseRootEntity\",\r\n      \"@schemaLocation\": null,\r\n      \"@type\": null,\r\n      \"href\": null,\r\n      \"name\": \"UBITECH\",\r\n      \"role\": \"REQUESTER\",\r\n      \"@referredType\": \"SimpleUsername_Individual\",\r\n      \"id\": \"2c034f2b-4ecc-44cc-9af3-6633aa96b217\",\r\n      \"extendedInfo\": null\r\n    }\r\n  ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/tmf-api/serviceOrdering/{{V4}}/serviceOrder",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tmf-api",
+						"serviceOrdering",
+						"{{V4}}",
+						"serviceOrder"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PollServiceOrderState",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const response = pm.response.json();",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"current_try = parseInt(pm.environment.get(\"_ServicePollingMaxRetries\"))",
+							"if (current_try === 180) { ",
+							"",
+							"    pm.environment.set(\"_ResponseStatus\", response.state);",
+							"    postman.setNextRequest(\"DeleteServiceOrder\");",
+							"    pm.expect.fail('Service order is not completed after 5 min!');",
+							"",
+							"}",
+							"",
+							"if (response.state === 'ACKNOWLEDGED' || response.state === 'IN_PROGRESS' ) {",
+							"",
+							"    pm.environment.set(\"_ServicePollingMaxRetries\", current_try+1)",
+							"    postman.setNextRequest(pm.info.requestId);// run again!",
+							"",
+							"} else if (response.state === 'COMPLETED') {",
+							"    console.log('Task succedded with state: '+response.state);",
+							"    pm.environment.set(\"_ResponseStatus\", response.state);",
+							"    response.serviceOrderItem.forEach(item => {",
+							"        if (item.service.name === 'service-spec-end-user-cfs' || item.service.name === 'service-spec-end-user-cfs-ocm') {",
+							"            let serviceId = item.service.id;",
+							"            console.log('Service ID: ' + serviceId);",
+							"            pm.environment.set(\"_ServiceId\", serviceId);",
+							"        }",
+							"    });",
+							"} else if (response.state === 'FAILED' || response.state === 'PARTIAL' ) {",
+							"    console.log('Task has state: '+response.state);",
+							"    pm.environment.set(\"_ResponseStatus\", response.state);",
+							"    pm.expect.fail('Task failed as return state: '+response.state);",
+							"    // response.serviceOrderItem.forEach(item => {",
+							"    //     if (item.service.name === 'service-spec-end-user-cfs' || item.service.name === 'service-spec-end-user-cfs-ocm') {",
+							"    //         pm.globals.unset(\"variable_key\");",
+							"    //         let serviceId = item.service.id;",
+							"    //         console.log('Service ID: ' + serviceId);",
+							"    //         pm.environment.set(\"_ServiceId\", serviceId);",
+							"    //     }",
+							"    // });",
+							"} else{",
+							"    pm.environment.set(\"_ResponseStatus\", response.state);",
+							"    pm.expect.fail('Task failed as return state: '+response.state);",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"setTimeout(function(){",
+							"    console.log(\"Delay 10 sec and execute the next GET request\")",
+							"}, 10000); // 10 sec"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/tmf-api/serviceOrdering/{{V4}}/serviceOrder/{{_ServiceOrderRandomUUID}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tmf-api",
+						"serviceOrdering",
+						"{{V4}}",
+						"serviceOrder",
+						"{{_ServiceOrderRandomUUID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PollServiceInventoryState",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// setTimeout(function(){",
+							"//     console.log(\"Delay 10 sec and execute the next GET request\")",
+							"// }, 10000); // 10 sec"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const response = pm.response.json();",
+							"const serviceId = pm.variables.get(\"_ServiceId\");",
+							"",
+							"let serviceNamespace = null;",
+							"let serviceDeploymentName = null;",
+							"let deploymentNames = [];",
+							"let supportingResourceHrefs = [];  // To store supportingResource information",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"if (response.state === 'ACTIVE') {",
+							"    console.log('Task succedded with state: '+response.state);",
+							"    console.log('Service with state: ' + response.state + ' and ServiceId: ' + serviceId);",
+							"",
+							"    response.supportingService.forEach(service => {",
+							"        service.serviceCharacteristic.forEach(characteristic => {",
+							"            if (characteristic.name === \"Service namespace(s)\") {",
+							"                serviceNamespace = characteristic.value.value;",
+							"            }",
+							"            if (characteristic.name === \"Compute Characteristics\") {",
+							"                try {",
+							"                    const computeCharacteristics = JSON.parse(characteristic.value.value)[0];",
+							"                    if (computeCharacteristics.deploymentsManifests) {",
+							"                        Object.keys(computeCharacteristics.deploymentsManifests).forEach(key => {",
+							"                        // Parse the inner JSON string for each deployment manifest",
+							"                            const deploymentManifest = JSON.parse(computeCharacteristics.deploymentsManifests[key]);",
+							"            ",
+							"                                // Extract the \"name\" within metadata and add to deploymentNames array",
+							"                                if (deploymentManifest.metadata && deploymentManifest.metadata.name) {",
+							"                                    deploymentNames.push(deploymentManifest.metadata.name);",
+							"                                }",
+							"                        });",
+							"                    }",
+							"                } catch (error) {",
+							"                    console.log(\"Error parsing nested JSON for Compute Characteristics:\", error);",
+							"                }",
+							"",
+							"            }",
+							"        });",
+							"    });",
+							"    if (response.supportingResource && response.supportingResource.length > 0) {",
+							"        response.supportingResource.forEach(resource => {",
+							"            if (resource.href) {",
+							"                supportingResourceHrefs.push(resource.href);",
+							"            }",
+							"        });",
+							"    }",
+							"} else if (response.state === 'INACTIVE' || response.state === 'RESERVED') {",
+							"    console.log('Service with state: ' + response.state + ' and ServiceId: ' + serviceId);",
+							"    pm.expect.fail('Task failed as return state: '+response.state);",
+							"} else{",
+							"    console.log('Service with state: ' + response.state + ' and ServiceId: ' + serviceId);",
+							"    pm.expect.fail('Task failed as return state: '+response.state);",
+							"}",
+							"",
+							"",
+							"// If service namespace is found, store it in an environment variable",
+							"if (serviceNamespace) {",
+							"    pm.environment.set(\"_ServiceNamespace\", serviceNamespace);",
+							"    console.log(\"Service namespace(s) stored as environment variable:\", serviceNamespace);",
+							"} else {",
+							"    console.log(\"Service namespace(s) not found in the response.\");",
+							"}",
+							"",
+							"// If service deployment name is found, store it in an environment variable",
+							"if (deploymentNames.length > 0) {",
+							"    pm.environment.set(\"_ServiceDeploymentNames\", JSON.stringify(deploymentNames));",
+							"    console.log(\"Service deployment names stored as environment variable:\", deploymentNames);",
+							"} else {",
+							"    console.log(\"No deployment names found in the response.\");",
+							"}",
+							"",
+							"if (supportingResourceHrefs.length > 0) {",
+							"    pm.environment.set(\"_SupportingResourceHrefs\", JSON.stringify(supportingResourceHrefs));",
+							"    console.log(\"Supporting resource hrefs stored as environment variable:\", supportingResourceHrefs);",
+							"} else {",
+							"    console.log(\"No supporting resource hrefs found in the response.\");",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/tmf-api/serviceInventory/{{V4}}/service/{{_ServiceId}}",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"tmf-api",
+						"serviceInventory",
+						"{{V4}}",
+						"service",
+						"{{_ServiceId}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

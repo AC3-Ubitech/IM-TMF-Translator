@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: uc3-applications
+  labels:
+    name: uc3-applications
+    app: uc3

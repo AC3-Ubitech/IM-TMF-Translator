@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq
+  namespace: ${ApplicationName}
+  labels:
+    app: rabbitmq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      containers:
+      - name: rabbitmq
+        image: ${Image}
+        ports:
+        - containerPort: ${ApiPort1}
+        - containerPort: ${ApiPort2}
+        env:
+        - name: RABBITMQ_DEFAULT_USER
+          value: "guest"
+        - name: RABBITMQ_DEFAULT_PASS
+          value: "guest"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+  namespace: ${ApplicationName}
+  labels:
+    app: rabbitmq
+spec:
+  ports:
+  - port: ${ApiPort1}
+    targetPort: ${ApiPort1}
+    protocol: TCP
+    name: amqp
+  - port: ${ApiPort2}
+    targetPort: ${ApiPort2}
+    protocol: TCP
+    name: http
+  selector:
+    app: rabbitmq

@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  web:
+    restart: always
+    container_name: im-translator-server
+    build:
+      context: .
+      args:
+        ACCESS_TOKEN_USER: ${ACCESS_TOKEN_USER}
+        ACCESS_TOKEN_PASSWORD: ${ACCESS_TOKEN_PASSWORD}
+        CLEAN_REGISTRY_URL: ${CLEAN_REGISTRY_URL}
+    ports:
+      - "5000:5000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 90s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    volumes:
+      - ./output_k8s_manifests:/app/output_k8s_manifests
+      - ./incoming-descriptors/deploy:/app/incoming-descriptors/deploy
+      - ./incoming-descriptors/update:/app/incoming-descriptors/update
+      - ./kubeconfigs/cluster-4.yaml:/root/.kube/config:ro
+      - ./kubeconfigs/AC3-kubeconfig.ymal:/root/.kube/hub-config:ro
+    env_file:
+      - .env
+    environment:
+      - KUBECONFIG=/root/.kube/config

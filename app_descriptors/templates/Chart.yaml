@@ -1,0 +1,6 @@
+apiVersion: v2
+name: ${ApplicationName}
+description: "A Helm chart for ${ApplicationName}"
+type: application
+version: ${Version}
+appVersion: ${Version}

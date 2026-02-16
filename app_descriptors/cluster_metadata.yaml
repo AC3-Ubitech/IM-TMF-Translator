@@ -1,0 +1,12 @@
+apiVersion: scheduling.p2code.eu/v1alpha1
+kind: P2CodeSchedulingManifest
+metadata:
+  labels:
+    app.kubernetes.io/name: p2code-scheduler
+    app.kubernetes.io/managed-by: kustomize
+  name: translated-app
+  namespace: p2code-scheduler-system
+spec:
+  globalAnnotations:
+    - "p2code.target.managedClusterSet=ac3"
+    - "p2code.target.cluster=cluster-4"

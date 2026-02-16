@@ -1,0 +1,11 @@
+# created by virtualenv automatically
+/Lib
+pyvenv.cfg
+/Scripts
+output_k8s_manifests
+incoming-descriptors
+*/__pycache__
+*/*/__pycache__
+
+/kubeconfigs
+/__pycache__

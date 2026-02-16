@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: ${ApplicationName}
+  labels:
+    app: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: ${Image}
+        ports:
+        - containerPort: ${ApiPort1}
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        volumeMounts:
+        - name: redis-data
+          mountPath: ${VolumeMountPath}
+      volumes:
+      - name: redis-data
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: ${ApplicationName}
+  labels:
+    app: redis
+spec:
+  ports:
+  - port: ${ApiPort1}
+    targetPort: ${ApiPort1}
+    protocol: TCP
+    name: redis
+  selector:
+    app: redis

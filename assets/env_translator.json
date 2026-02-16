@@ -1,0 +1,123 @@
+{
+	"id": "e1af6d5f-beab-4084-8a30-6025f6efc9cc",
+	"name": "Workflow Translator",
+	"values": [
+		{
+			"key": "host",
+			"value": "https://maestro.euprojects.net",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "port",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "V5",
+			"value": "v5",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "V4",
+			"value": "v4",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "V3",
+			"value": "v3",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "host-keycloak",
+			"value": "https://maestro-keycloak.euprojects.net",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "_KeycloakAccessToken",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "_ServiceOrderRandomUUID",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "_ServiceCurrentIsoTime",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "_ServiceFutureIsoTime",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "_ServicePollingMaxRetries",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "_ServiceId",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "_ServiceNamespace",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "_ServiceDeploymentNames",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "TerminatedServiceResponse",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "PeeredOrganizationResponse",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "_ServiceK8sId",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		},
+		{
+			"key": "_ServiceOrderResourceK8sId",
+			"value": "",
+			"type": "default",
+			"enabled": true
+		},
+		{
+			"key": "_ResponseStatus",
+			"value": "",
+			"type": "any",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2025-10-09T13:12:08.950Z",
+	"_postman_exported_using": "Postman/10.24.27"
+}
