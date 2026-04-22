@@ -455,3 +455,6 @@ curl -X PATCH -F "file=@updated_uc3_descriptor.yaml" https://im-tmf-translator.d
 ## References:
 
 The latest valid inputs for `im-translator` service can be fount on [here](./app_descriptors/uc3_descriptor.yaml). There is also a version that differs slightly in terms of data (not schema) under [this link](./app_descriptors/updated_uc3_descriptor.yaml). The second one can be used to perform an update to an already deployed service.
+
+## Acknowledgement:
+AC3 project has received funding from European Union's Horizon Europe research and innovation programme under Grant Agreement No 101093129.
